@@ -1,18 +1,19 @@
 import './App.css'
+import {Routes, Route} from "react-router-dom";
+import Layout from './layout/Layout';
+import HomePage from "./pages/HomePage";
+import HousingPage from "./pages/HousingPage";
+import ReminderPage from "./pages/ReminderPage";
 
 function App() {
-
   return (
-    <>
-      <div>
-        <h1>
-          International Students Companion
-        </h1>
-        <p>
-          Frontend initialized successfully.
-        </p>
-      </div>
-    </>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/housing" element={<HousingPage />} />
+        <Route path="/reminders" element={<ReminderPage />} />
+      </Routes>
+    </Layout>
   )
 }
 
