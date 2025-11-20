@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["student", "landlord", "admin"],
-    defualt: "student"
+    default: "student"
   },
 
   isVerified: { type: Boolean, default: false },

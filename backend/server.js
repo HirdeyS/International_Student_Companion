@@ -6,6 +6,8 @@ import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profile.js";
 import verificationRoutes from "./routes/verification.js";
 import idUploadRoutes from "./routes/idUpload.js";
+import authRoutes from "./routes/auth.js";
+import adminRoutes from "./routes/admin.js";
 
 dotenv.config();
 console.log("MONGO_URI =", process.env.MONGO_URI);
@@ -13,7 +15,7 @@ console.log("MONGO_URI =", process.env.MONGO_URI);
 const app = express();
 
 // Middleware
-app.use(express.json()); 
+app.use(express.json());
 
 // Routes
 app.use("/api/profile", profileRoutes);
@@ -21,6 +23,8 @@ app.use("/api", userRoutes);
 app.use("/api/verify", verificationRoutes);
 app.use("/api/id", idUploadRoutes);
 app.use(errorHandler);
+app.use("/api", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // MongoDB connection
 mongoose
