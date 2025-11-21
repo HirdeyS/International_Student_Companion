@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
+
 const app = express();
 
 // MongoDB connection
