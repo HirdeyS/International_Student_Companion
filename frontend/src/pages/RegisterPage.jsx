@@ -5,28 +5,20 @@ import TextInput from "../components/ui/TextInput";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import { register } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import { maxWidth } from "@mui/system";
 
 export default function RegisterPage() {
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: "",
-    });
-
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-
-    function handleChange(e) {
-        setForm({...form, [e.target.name]: e.target.value});
-    }
 
     async function handleRegister(e) {
         e.preventDefault();
         setError("");
 
         try {
-            await register(form);
+            await register({name, email, password});
             alert("Account created. Check your email to verify your account.");
             navigate("/login");
         } catch (err) {
@@ -42,9 +34,9 @@ export default function RegisterPage() {
             {error && <ErrorMessage message={error}/>}
 
             <form onSubmit={handleRegister}>
-                <TextInput name="name" label="Name" value={form.name} onChange={handleChange}/>
-                <TextInput name="email" label="Email" value={form.email} onChange={handleChange}/>
-                <TextInput name="password" label="Password" value={form.password} onChange={handleChange}/>
+                <TextInput name="name" label="Name" value={name} onChange={(e) => setName(e.target.value)}/>
+                <TextInput name="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                <TextInput name="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
             
                 <PrimaryButton fullWidth type="submit">
                     Register

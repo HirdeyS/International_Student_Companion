@@ -3,7 +3,8 @@ import Card from "../components/ui/Card";
 import PrimaryButton from "../components/ui/PrimaryButton";
 import TextInput from "../components/ui/TextInput";
 import ErrorMessage from "../components/ui/ErrorMessage";
-import { login } from "../services/authService"
+import { login as loginService } from "../services/authService"
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 
@@ -11,6 +12,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     async function handleLogin(e) {
@@ -18,10 +20,10 @@ export default function LoginPage() {
         setError("");
 
         try {
-            const data = await login(email, password);
+            const data = await loginService(email, password);
 
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+
+            login(data.user, data.token);
 
             navigate("/profile");
         } catch (err) {

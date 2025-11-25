@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -14,6 +15,11 @@ console.log("MONGO_URI =", process.env.MONGO_URI);
 
 
 const app = express();
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 
 // Middleware
 app.use(express.json());
