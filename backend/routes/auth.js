@@ -2,6 +2,8 @@ import express from "express";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
@@ -10,28 +12,20 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user exists
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Compare hashed password using bcrypt
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Check if email is verified
-    if (!user.isVerified)
-      return res.status(400).json({ message: "Email not verified" });
+    if (!user.isVerified) return res.status(400).json({ message: "Email not verified" });
 
-    // Create JWT including role
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Respond with token and user info
     res.json({
       token,
       user: {
@@ -47,16 +41,55 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
+// POST /api/register
 router.post("/register", async (req, res) => {
   try {
-    const user = new User(req.body);
+    const { name, email, password, role } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: "User already exists" });
+
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || "student",
+      isVerified: false,
+    });
+
+    // Generate verification token
+    const token = crypto.randomBytes(20).toString("hex");
+    user.verificationToken = token;
     await user.save();
-    res.status(201).json({ message: "User created successfully" });
+
+    // Send verification email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Verify your account",
+      text: `Click this link to verify your account: http://localhost:3000/api/verify/${token}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(201).json({ message: "User registered. Verification email sent." });
   } catch (err) {
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 });
 
 export default router;
+
 

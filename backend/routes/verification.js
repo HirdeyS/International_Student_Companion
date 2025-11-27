@@ -5,16 +5,20 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
+// POST /api/verify/send
+// Generate a verification token and send it via email
 router.post("/send", async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Generate unique verification token
     const token = crypto.randomBytes(20).toString("hex");
     user.verificationToken = token;
     await user.save();
 
+    // Configure email transport
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -23,6 +27,7 @@ router.post("/send", async (req, res) => {
       }
     });
 
+    // Email content
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
@@ -38,11 +43,14 @@ router.post("/send", async (req, res) => {
   }
 });
 
+// GET /api/verify/:token
+// Verify the user's account using the token
 router.get("/:token", async (req, res) => {
   try {
     const user = await User.findOne({ verificationToken: req.params.token });
     if (!user) return res.status(400).json({ message: "Invalid token" });
 
+    // Activate the account and remove the token
     user.isVerified = true;
     user.verificationToken = null;
     await user.save();
@@ -54,3 +62,4 @@ router.get("/:token", async (req, res) => {
 });
 
 export default router;
+
