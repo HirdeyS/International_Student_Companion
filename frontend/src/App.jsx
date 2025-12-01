@@ -5,11 +5,6 @@ import HousingPage from "./pages/HousingPage";
 import ReminderPage from "./pages/ReminderPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import CreateListing from "./pages/CreateListingsPage";
-
-import "leaflet/dist/leaflet.css";
-
-
 
 function App() {
   return (
@@ -20,8 +15,6 @@ function App() {
         <Route path="/reminders" element={<ReminderPage />} />
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage/>}/>
-        <Route path="/housing/create" element={<CreateListing />} />
-
       </Routes>
     </Layout>
   )
