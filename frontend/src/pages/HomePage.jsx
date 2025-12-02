@@ -87,30 +87,38 @@ export default function HomePage() {
             What You Can Do
           </Typography>
 
-          <Grid
-            container
-            spacing={4}
-            justifyContent="center"
-            sx={{ mt: 3 }}
-          >
-            <Grid item xs={12} md={4}>
-              <Paper
-                sx={{
-                  p: 3,
-                  height: "100%",
-                  textAlign: "center",
-                  boxShadow: 3,
-                  borderRadius: 2,
-                }}
-              >
-                <Typography variant="h5" fontWeight={600} gutterBottom>
-                  Verified Housing
-                </Typography>
-                <Typography>
-                  Browse safe listings verified by students and landlords.
-                </Typography>
-              </Paper>
-            </Grid>
+              <Grid
+                container
+                spacing={4}
+                justifyContent="center"
+                sx={{ mt: 3 }}
+              ><Grid item xs={12} md={4}>
+      <Link to="/housing" style={{ textDecoration: "none" }}>
+        <Paper
+          sx={{
+            p: 3,
+            height: "100%",
+            textAlign: "center",
+            boxShadow: 3,
+            borderRadius: 2,
+            cursor: "pointer",          // show pointer on hover
+            "&:hover": {
+              boxShadow: 6,
+              transform: "scale(1.03)",
+              transition: "all 0.2s ease-in-out",
+            },
+          }}
+        >
+          <Typography variant="h5" fontWeight={600} gutterBottom>
+            Verified Housing
+          </Typography>
+          <Typography color="text.secondary">
+            Browse safe listings verified by students and landlords.
+          </Typography>
+        </Paper>
+      </Link>
+    </Grid>
+
 
             <Grid item xs={12} md={4}>
               <Paper

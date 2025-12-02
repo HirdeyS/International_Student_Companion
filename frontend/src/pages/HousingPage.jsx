@@ -73,7 +73,14 @@ export default function HousingPage() {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* LEFT SIDE – LISTINGS + SEARCH */}
       <div style={{ width: "45%", padding: "15px", overflowY: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
         <h2>Available Housing</h2>
+        
+        <Link to="/create-listing">
+          <PrimaryButton>Create Listing</PrimaryButton>
+        </Link>
+      </div>
+
 
         {/* SEARCH BAR + SUGGESTIONS */}
         <div style={{ position: "relative" }}>
@@ -134,25 +141,34 @@ export default function HousingPage() {
         ))}
       </div>
 
-      {/* RIGHT SIDE – MAP */}
+          {/* RIGHT SIDE – MAP */}
       <div style={{ width: "55%", height: "100%" }}>
         <MapContainer
-          center={[43.7, -79.4]} // Toronto approx center
+          center={[43.7, -79.4]}
           zoom={11}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {/* HARDCODED MARKERS ON MAP */}
-          {hardcodedListings.map((loc) => (
-            <Marker key={loc.id} position={loc.position}>
-              <Popup>
-                <b>{loc.title}</b>
-                <br />
-                {loc.address}
-              </Popup>
-            </Marker>
-          ))}
+          {/* DYNAMIC MARKERS FROM DATABASE */}
+          {listings
+            .filter((l) => l.latitude && l.longitude) // ensure coords exist
+            .map((listing) => (
+              <Marker
+                key={listing._id}
+                position={[listing.latitude, listing.longitude]}
+              >
+                <Popup>
+                  <b>{listing.title}</b>
+                  <br />
+                  {listing.address}
+                  <br />
+                  ${listing.price}
+                  <br />
+                  <Link to={`/housing/${listing._id}`}>View details</Link>
+                </Popup>
+              </Marker>
+            ))}
         </MapContainer>
       </div>
     </div>

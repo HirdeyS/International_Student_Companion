@@ -51,17 +51,38 @@ export default function CreateListing() {
   };
 
   // Submit listing
-  async function handleSubmit(e) {
-    e.preventDefault();
+async function handleSubmit(e) {
+  e.preventDefault();
 
-    await fetch("/api/listings", {
+  try {
+    const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+      body: JSON.stringify({
+        title: form.title,
+        address: form.address,
+        price: Number(form.price),     // convert to number
+        latitude: Number(form.lat),    // map lat → latitude
+        longitude: Number(form.lng)    // map lng → longitude
+      })
     });
 
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Server error:", errorText);
+      throw new Error("Failed");
+    }
+
+    alert("Listing created successfully!");
     navigate("/housing");
+
+  } catch (err) {
+    alert("There was an error creating the listing.");
+    console.error(err);
   }
+}
+
+
 
   // Dropdown styles
   const suggestionStyle = {

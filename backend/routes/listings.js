@@ -40,8 +40,10 @@ router.post("/", async (req, res) => {
     const saved = await listing.save();
     res.status(201).json(saved);
   } catch (err) {
-    res.status(400).json({ message: "Failed to create listing", error: err });
-  }
+  console.error("Listing creation error:", err);
+  res.status(400).json({ message: "Failed to create listing", error: err });
+}
+  
 });
 
 /* ============================

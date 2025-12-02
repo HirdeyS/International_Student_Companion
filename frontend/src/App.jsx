@@ -6,7 +6,7 @@ import ReminderPage from "./pages/ReminderPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CreateListing from "./pages/CreateListingsPage";
-
+import SingleListingsPage from "./pages/SingleListingsPage";
 import "leaflet/dist/leaflet.css";
 
 
@@ -17,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/housing" element={<HousingPage />} />
+        <Route path="/housing/:id" element={<SingleListingsPage />} />
         <Route path="/reminders" element={<ReminderPage />} />
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/register" element={<RegisterPage/>}/>
