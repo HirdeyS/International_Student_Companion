@@ -3,24 +3,33 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+  // Shared fields
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
 
-    role: {
-      type: String,
-      enum: ["student", "landlord", "admin"],
-      default: "student",
-    },
+  role: {
+    type: String,
+    enum: ["student", "landlord", "admin"],
+    default: "student",
+  },
 
-    isVerified: { type: Boolean, default: false },
-    verificationToken: String,
-    idDocument: String,
+  isVerified: { type: Boolean, default: false },
+  verificationToken: String,
+  idDocument: String,
 
-    avatar: String,
-    bio: String,
-    program: String,
-    countryOfOrigin: String,
+  avatar: String,
+
+  // Student fields
+  program: String,
+  countryOfOrigin: String,
+  bio: String,
+
+  // Landlord fields
+  businessName: String,
+  phoneNumber: String,
+  website: String,
+  about: String,
   },
   { timestamps: true }
 );

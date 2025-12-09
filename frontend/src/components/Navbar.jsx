@@ -22,17 +22,35 @@ export default function Navbar() {
           >
             Student Companion
           </Typography>
+          
+          {isAuthenticated && user.role === "student" && (
+            <Button component={Link} to="/housing" sx={{ color: "white" }}>
+              Housing
+            </Button>
+          )}
 
-          {isAuthenticated && (
+          {isAuthenticated && user.role === "landlord" && (
             <>
-              <Button component={Link} to="/housing" sx={{ color: "white" }}>
-                Housing
+              <Button component={Link} to="/landlord/listings" sx={{ color: "white" }}>
+                My Listings
               </Button>
 
-              <Button component={Link} to="/reminders" sx={{ color: "white" }}>
-                Reminders
+              <Button component={Link} to="/housing/new" sx={{ color: "white" }}>
+                Add Listing
               </Button>
             </>
+          )}
+
+          {isAuthenticated && user.role === "admin" && (
+            <Button component={Link} to="/admin" sx={{ color: "white" }}>
+              Admin Panel
+            </Button>
+          )}
+
+          {isAuthenticated && (
+            <Button component={Link} to="/profile" sx={{ color: "white" }}>
+              Profile
+            </Button>
           )}
         </Box>
 

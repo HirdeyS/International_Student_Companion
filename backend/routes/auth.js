@@ -49,13 +49,10 @@ router.post("/register", async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-    // Hash password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
+      password,
       role: role || "student",
       isVerified: false,
     });
@@ -65,25 +62,34 @@ router.post("/register", async (req, res) => {
     user.verificationToken = token;
     await user.save();
 
-    // Send verification email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    res.status(201).json({
+      message: "Registered successfully. Check your email to verify your account.",
     });
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: user.email,
-      subject: "Verify your account",
-      text: `Click this link to verify your account: http://localhost:3000/api/verify/${token}`,
-    };
+    setImmediate(async () => {
+      try {
+        const transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
 
-    await transporter.sendMail(mailOptions);
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: user.email,
+          subject: "Verify your account",
+          text: `Click this link to verify your account: http://localhost:3000/api/verify/${token}`,
+        });
 
-    res.status(201).json({ message: "User registered. Verification email sent." });
+        console.log("Verification email sent to:", user.email);
+      } catch(e) {
+        console.error("Email send error", e);
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err.message });

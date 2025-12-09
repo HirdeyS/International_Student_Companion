@@ -29,7 +29,7 @@ router.post("/send", async (req, res) => {
 
     // Email content
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"International Student Companion" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Verify your account",
       text: `Click this link to verify your account: http://localhost:3000/api/verify/${token}`

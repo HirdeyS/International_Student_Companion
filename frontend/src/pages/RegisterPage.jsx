@@ -5,24 +5,33 @@ import TextInput from "../components/ui/TextInput";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import { register } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 
 export default function RegisterPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "student",
+    });
+
     const [error, setError] = useState("");
     const navigate = useNavigate();
+
+    function updateField(field, value) {
+        setForm(prev => ({ ...prev, [field]: value }));
+    }
 
     async function handleRegister(e) {
         e.preventDefault();
         setError("");
 
         try {
-            await register({name, email, password});
+            await register(form);
             alert("Account created. Check your email to verify your account.");
             navigate("/login");
         } catch (err) {
-            setError(err.response?.data?.error || "Registration failed");
+            setError(err.response?.data?.message || "Registration failed");
         }
     }
 
@@ -34,14 +43,39 @@ export default function RegisterPage() {
             {error && <ErrorMessage message={error}/>}
 
             <form onSubmit={handleRegister}>
-                <TextInput name="name" label="Name" value={name} onChange={(e) => setName(e.target.value)}/>
-                <TextInput name="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
-                <TextInput name="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
-            
+                <TextInput 
+                label="Name"
+                value={form.name}
+                onChange={(e) => updateField("name", e.target.value)}
+                />
+
+                <TextInput 
+                label="Email"
+                value={form.email}
+                onChange={(e) => updateField("email", e.target.value)}
+                />
+
+                <TextInput 
+                label="Password"
+                type="password"
+                value={form.password}
+                onChange={(e) => updateField("password", e.target.value)}
+                />
+
+                <FormControl sx={{ mt: 2 }}>
+                <FormLabel>User Type</FormLabel>
+                <RadioGroup
+                    value={form.role}
+                    onChange={(e) => updateField("role", e.target.value)}
+                >
+                    <FormControlLabel value="student" control={<Radio />} label="Student" />
+                    <FormControlLabel value="landlord" control={<Radio />} label="Landlord" />
+                </RadioGroup>
+                </FormControl>
+
                 <PrimaryButton fullWidth type="submit">
-                    Register
+                Register
                 </PrimaryButton>
-            
             </form>
         </Card>
     )

@@ -25,7 +25,7 @@ export default function LoginPage() {
 
             login(data.user, data.token);
 
-            navigate("/profile");
+            navigate("/");
         } catch (err) {
             setError(err.response?.data?.message || "Login failed");
         }

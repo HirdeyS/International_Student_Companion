@@ -9,6 +9,7 @@ import idUploadRoutes from "./routes/idUpload.js";
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
 import listingRoutes from "./routes/listings.js";
+import { runSeed } from "./seed/index.js";
 
 dotenv.config();
 console.log("MONGO_URI =", process.env.MONGO_URI);
@@ -37,7 +38,13 @@ app.use(errorHandler);
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
+  .then(async () => {
+    console.log("Connected to MongoDB");
+
+    if (process.env.NODE_ENV !== "production") {
+      await runSeed();
+    }
+  })
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start server
