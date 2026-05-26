@@ -48,6 +48,12 @@ export default function Navbar() {
           )}
 
           {isAuthenticated && (
+            <Button component={Link} to="/news" sx={{ color: "white" }}>
+              News
+            </Button>
+          )}
+
+          {isAuthenticated && (
             <Button component={Link} to="/profile" sx={{ color: "white" }}>
               Profile
             </Button>

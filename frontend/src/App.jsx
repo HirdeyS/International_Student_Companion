@@ -9,6 +9,7 @@ import ProfilePage from "./pages/EditProfilePage";
 import CreateListingPage from "./pages/CreateListingPage";
 import ListingDetailsPage from "./pages/ListingDetailsPage";
 import LandlordDashboard from "./pages/LandlordDashboard";
+import NewsPage from "./pages/NewsPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/housing/new" element={<CreateListingPage />} />
         <Route path="/landlord/listings" element={<LandlordDashboard />} />
+        <Route path="/news" element={<NewsPage />} />
         {/* <Route path="/user/:id" element={<PublicProfile/>}/> */}
       </Routes>
     </Layout>

@@ -111,49 +111,61 @@ export default function HousingPage() {
 
       {/* MORE LISTINGS BUTTON */}
       {searchText && (
-        <div style={{ marginTop: 30 }}>
-          <PrimaryButton onClick={() => setShowExternal(true)}>
-            More Listings
+        <div style={{ marginTop: 30, textAlign: "center" }}>
+          <PrimaryButton onClick={() => setShowExternal((prev) => !prev)}>
+            {showExternal ? "Hide External Listings" : "Search More Listings"}
           </PrimaryButton>
         </div>
       )}
 
       {/* EXTERNAL LINKS */}
-      {showExternal && (
-        <div style={{ marginTop: 20 }}>
-          <h3>Search More Listings</h3>
+{showExternal && searchText && (
+  <div style={{ marginTop: 20 }}>
+    <Card sx={{ padding: 20 }}>
+      <h3 style={{ marginBottom: 15 }}>Search More Listings</h3>
 
-          {externalLinks.map((link, index) => {
-            const Icon = link.icon;
+      <p style={{ marginBottom: 20, color: "#666" }}>
+        Expand your search using external housing platforms.
+      </p>
 
-            return (
-              <button
-                key={index}
-                onClick={() => window.open(link.url, "_blank")}
-                style={{
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {externalLinks.map((link, index) => {
+          const Icon = link.icon;
+
+          return (
+            <a
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              <Card
+                sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px",
-                  width: "100%",
-                  padding: "14px",
-                  marginBottom: "12px",
-                  borderRadius: "10px",
-                  border: "1px solid #ddd",
-                  background: "#fff",
+                  gap: 12,
+                  padding: 15,
                   cursor: "pointer",
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                  transition: "0.2s",
                 }}
               >
-                <Icon size={24} />
+                <Icon size={22} />
 
-                Open on {link.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <strong>Open {link.name}</strong>
+                  <span style={{ fontSize: 13, color: "#666" }}>
+                    Search: "{searchText}"
+                  </span>
+                </div>
+              </Card>
+            </a>
+          );
+        })}
+      </div>
+    </Card>
+  </div>
+)}
     </div>
   );
 }
