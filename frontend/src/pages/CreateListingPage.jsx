@@ -3,7 +3,7 @@ import Card from "../components/ui/Card";
 import TextInput from "../components/ui/TextInput";
 import PrimaryButton from "../components/ui/PrimaryButton";
 import ErrorMessage from "../components/ui/ErrorMessage";
-import { createListing, updateListing } from "../services/listingService";
+import { createListing, updateListing, getListing } from "../services/listingService";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, FormControlLabel, Checkbox } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
@@ -23,19 +23,23 @@ export default function CreateListingPage() {
     furnished: false,
     shared: false,
     availableFrom: "",
-    latitude: "",
-    longitude: ""
   });
 
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  function updateField(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  // Protect route
   useEffect(() => {
     if (user?.role !== "landlord") {
       navigate("/housing");
     }
   }, [user]);
 
+  // Google Places Autocomplete (ONLY ADDRESS)
   useEffect(() => {
     const loader = new Loader({
       apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -45,25 +49,25 @@ export default function CreateListingPage() {
 
     loader.load().then(() => {
       const input = document.getElementById("address-input");
+
       const autocomplete = new google.maps.places.Autocomplete(input);
 
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
-        const location = place.geometry.location;
 
         updateField("address", place.formatted_address);
-        updateField("latitude", location.lat());
-        updateField("longitude", location.lng());
       });
     });
   }, []);
 
+  // Load listing for edit
   useEffect(() => {
     async function loadListing() {
       if (!isEdit) return;
 
       try {
         const data = await getListing(id);
+
         setForm({
           title: data.title,
           description: data.description,
@@ -72,8 +76,6 @@ export default function CreateListingPage() {
           furnished: data.furnished,
           shared: data.shared,
           availableFrom: data.availableFrom?.split("T")[0] || "",
-          latitude: data.latitude || "",
-          longitude: data.longitude || "",
         });
       } catch (err) {
         setError("Failed to load listing");
@@ -83,10 +85,7 @@ export default function CreateListingPage() {
     loadListing();
   }, [id]);
 
-  function updateField(field, value) {
-    setForm(prev => ({ ...prev, [field]: value }));
-  }
-
+  // Submit
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
@@ -94,8 +93,6 @@ export default function CreateListingPage() {
     const payload = {
       ...form,
       price: Number(form.price),
-      latitude: Number(form.latitude) || null,
-      longitude: Number(form.longitude) || null
     };
 
     try {
@@ -115,7 +112,7 @@ export default function CreateListingPage() {
 
   return (
     <Card sx={{ maxWidth: 600, margin: "20px auto" }}>
-      <h2>Create a New Listing</h2>
+      <h2>{isEdit ? "Edit Listing" : "Create a New Listing"}</h2>
 
       {error && <ErrorMessage message={error} />}
 
@@ -133,7 +130,7 @@ export default function CreateListingPage() {
         />
 
         <TextInput
-          id={"address-input"}
+          id="address-input"
           label="Address"
           value={form.address}
           onChange={(e) => updateField("address", e.target.value)}
@@ -173,25 +170,11 @@ export default function CreateListingPage() {
           type="date"
           value={form.availableFrom}
           onChange={(e) => updateField("availableFrom", e.target.value)}
-          shrinkLabel={ true }
-        />
-
-        <TextInput
-          label="Latitude"
-          type="number"
-          value={form.latitude}
-          onChange={(e) => updateField("latitude", e.target.value)}
-        />
-
-        <TextInput
-          label="Longitude"
-          type="number"
-          value={form.longitude}
-          onChange={(e) => updateField("longitude", e.target.value)}
+          shrinkLabel={true}
         />
 
         <PrimaryButton fullWidth type="submit">
-          Create Listing
+          {isEdit ? "Update Listing" : "Create Listing"}
         </PrimaryButton>
       </form>
     </Card>

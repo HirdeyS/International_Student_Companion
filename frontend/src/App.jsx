@@ -10,6 +10,7 @@ import CreateListingPage from "./pages/CreateListingPage";
 import ListingDetailsPage from "./pages/ListingDetailsPage";
 import LandlordDashboard from "./pages/LandlordDashboard";
 import NewsPage from "./pages/NewsPage";
+import DocumentsPage from "./pages/DocumentsPage";
 
 function App() {
   return (
@@ -18,14 +19,15 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/housing" element={<HousingPage />} />
         <Route path="/housing/:id" element={<ListingDetailsPage />} />
-        <Route path="/reminders" element={<ReminderPage />} />
+        {/* <Route path="/reminders" element={<ReminderPage />} /> */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/housing/new" element={<CreateListingPage />} />
         <Route path="/landlord/listings" element={<LandlordDashboard />} />
         <Route path="/news" element={<NewsPage />} />
-        {/* <Route path="/user/:id" element={<PublicProfile/>}/> */}
+        <Route path="/reminders" element={<DocumentsPage />} />
+        <Route path="/user/:id" element={<PublicProfile/>}/>
       </Routes>
     </Layout>
   )
