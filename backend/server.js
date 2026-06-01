@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
 import listingRoutes from "./routes/listings.js";
 import newsRoutes from "./routes/news.js";
+import communityRoutes from "./routes/community.js";
 import { runSeed } from "./seed/index.js";
 import { syncIRCCNews } from "./services/newsService.js";
 
@@ -35,6 +36,7 @@ app.use("/api/verify", verificationRoutes);
 app.use("/api/id", idUploadRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/news", newsRoutes);
+app.use("/api/community", communityRoutes);
 app.use("/api", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use(errorHandler);

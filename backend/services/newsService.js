@@ -6,7 +6,7 @@ const IRCC_FEED_URL = 'https://api.io.canada.ca/io-server/gc/news/en/v2?dept=dep
 
 const studentKeywords = [
   'student', 'study permit', 'pgwp', 'university', 
-  'college', 'dli', 'attestation', 'co-op', 'post-secondary'
+  'college', 'dli', 'attestation', 'pal', 'co-op', 'post-secondary'
 ];
 
 export const syncIRCCNews = async () => {

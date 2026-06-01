@@ -8,6 +8,8 @@ const communityPostSchema = new mongoose.Schema({
 
     group: { type: String, required: true },
 
+    status: { type: String, enum: ["pending", "approved"], default: "pending" },
+
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [{
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
