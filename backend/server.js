@@ -12,6 +12,7 @@ import adminRoutes from "./routes/admin.js";
 import listingRoutes from "./routes/listings.js";
 import newsRoutes from "./routes/news.js";
 import communityRoutes from "./routes/community.js";
+import documentRoutes from "./routes/documents.js";
 import { runSeed } from "./seed/index.js";
 import { syncIRCCNews } from "./services/newsService.js";
 
@@ -39,6 +40,7 @@ app.use("/api/news", newsRoutes);
 app.use("/api/community", communityRoutes);
 app.use("/api", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/documents", documentRoutes);
 app.use(errorHandler);
 
 

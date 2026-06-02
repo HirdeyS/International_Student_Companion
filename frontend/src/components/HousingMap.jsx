@@ -1,63 +1,46 @@
-import { GoogleMap, Marker, InfoWindow, useLoadScript } from "@react-google-maps/api";
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
 
-const mapContainerStyle = {
-    width: "100%",
-    height: "500px",
-};
+// fix default icon issue in Leaflet
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-const defaultCenter = {
-lat: 43.4695,
-lng: -79.7007,
-};
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 export default function HousingMap({ listings }) {
-    const navigate = useNavigate();
+  const defaultCenter = [43.6532, -79.3832]; // Toronto fallback
 
-    const { isLoaded } = useLoadScript({
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    });
+  return (
+    <div style={{ height: "400px", width: "100%", marginTop: 20 }}>
+      <MapContainer
+        center={defaultCenter}
+        zoom={10}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          attribution='&copy; OpenStreetMap contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-    const [selected, setSelected] = useState(null);
-
-    const dynamicCenter = listings.length && listings[0].latitude && listings[0].longitude
-        ? { lat: listings[0].latitude, lng: listings[0].longitude }
-        : defaultCenter;
-
-    if (!isLoaded) return <p>Loading map...</p>
-
-    return (
-        <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            zoom={14}
-            center={dynamicCenter}
-        >
-            {listings.map((listing) => (
-                listing.latitude && listing.longitude && (
-                    <Marker
-                        key={listing._id}
-                        position={{ lat: listing.latitude, lng: listing.longitude }}
-                        onClick={() => setSelected(listing)}
-                    />
-                )
-            ))}
-
-            {selected && (
-                <InfoWindow
-                    position={{ lat: selected.latitude, lng: selected.longitude }}
-                    onCloseClick={() => setSelected(null)}
-                >
-                    <div>
-                        <h3>{selected.title}</h3>
-                        <p>{selected.address}</p>
-                        <Link to={`/housing/${selected._id}`} style={{ color: "blue" }}>
-                            View Listing
-                        </Link>
-                    </div>
-                </InfoWindow>
-            )}
-        </GoogleMap>
-    );
-} 
+        {listings
+          .filter((l) => l.lat && l.lng)
+          .map((listing) => (
+            <Marker key={listing._id} position={[listing.lat, listing.lng]}>
+              <Popup>
+                <strong>{listing.title}</strong>
+                <br />
+                {listing.address}
+                <br />
+                ${listing.price}
+              </Popup>
+            </Marker>
+          ))}
+      </MapContainer>
+    </div>
+  );
+}

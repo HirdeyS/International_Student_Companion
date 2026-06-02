@@ -161,24 +161,6 @@ export default function HomePage() {
       <Typography variant="h3" fontWeight={700} gutterBottom>
         Welcome Back!
       </Typography>
-
-      <Typography variant="h6" sx={{ mb: 4 }}>
-        Choose a feature to get started.
-      </Typography>
-
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
-        <Link to="/housing">
-          <Button variant="contained" size="large">
-            Housing Finder
-          </Button>
-        </Link>
-
-        <Link to="/reminders">
-          <Button variant="contained" size="large">
-            Reminder Manager
-          </Button>
-        </Link>
-      </Box>
     </Box>
   );
 }

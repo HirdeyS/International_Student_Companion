@@ -3,17 +3,21 @@ import Card from "../components/ui/Card";
 import TextInput from "../components/ui/TextInput";
 import PrimaryButton from "../components/ui/PrimaryButton";
 import ErrorMessage from "../components/ui/ErrorMessage";
-import { createListing, updateListing, getListing } from "../services/listingService";
+import {
+  createListing,
+  updateListing,
+  getListing,
+} from "../services/listingService";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, FormControlLabel, Checkbox } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import { Loader } from "@googlemaps/js-api-loader";
 
 export default function CreateListingPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
 
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     title: "",
@@ -23,44 +27,24 @@ export default function CreateListingPage() {
     furnished: false,
     shared: false,
     availableFrom: "",
+    lat: null,
+    lng: null,
   });
 
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  // Protect route
+  // role protection
   useEffect(() => {
     if (user?.role !== "landlord") {
       navigate("/housing");
     }
   }, [user]);
 
-  // Google Places Autocomplete (ONLY ADDRESS)
-  useEffect(() => {
-    const loader = new Loader({
-      apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-      version: "weekly",
-      libraries: ["places"],
-    });
-
-    loader.load().then(() => {
-      const input = document.getElementById("address-input");
-
-      const autocomplete = new google.maps.places.Autocomplete(input);
-
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-
-        updateField("address", place.formatted_address);
-      });
-    });
-  }, []);
-
-  // Load listing for edit
+  // load listing for edit
   useEffect(() => {
     async function loadListing() {
       if (!isEdit) return;
@@ -76,8 +60,10 @@ export default function CreateListingPage() {
           furnished: data.furnished,
           shared: data.shared,
           availableFrom: data.availableFrom?.split("T")[0] || "",
+          lat: data.lat || null,
+          lng: data.lng || null,
         });
-      } catch (err) {
+      } catch {
         setError("Failed to load listing");
       }
     }
@@ -85,28 +71,54 @@ export default function CreateListingPage() {
     loadListing();
   }, [id]);
 
-  // Submit
+  // 🌍 OPTIONAL: simple geocoding using OpenStreetMap (Nominatim)
+  async function geocodeAddress(address) {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          address
+        )}`
+      );
+
+      const data = await res.json();
+
+      if (data?.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+        };
+      }
+    } catch (err) {
+      console.warn("Geocoding failed", err);
+    }
+
+    return { lat: null, lng: null };
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
+    const coords =
+      form.address ? await geocodeAddress(form.address) : { lat: null, lng: null };
+
     const payload = {
       ...form,
       price: Number(form.price),
+      lat: coords.lat,
+      lng: coords.lng,
     };
 
     try {
       if (isEdit) {
         await updateListing(id, payload);
-        alert("Listing updated!");
       } else {
         await createListing(payload);
-        alert("Listing created!");
       }
 
       navigate("/housing");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create listing");
+      setError(err.response?.data?.message || "Failed to save listing");
     }
   }
 
@@ -130,7 +142,6 @@ export default function CreateListingPage() {
         />
 
         <TextInput
-          id="address-input"
           label="Address"
           value={form.address}
           onChange={(e) => updateField("address", e.target.value)}
@@ -170,7 +181,7 @@ export default function CreateListingPage() {
           type="date"
           value={form.availableFrom}
           onChange={(e) => updateField("availableFrom", e.target.value)}
-          shrinkLabel={true}
+          shrinkLabel
         />
 
         <PrimaryButton fullWidth type="submit">

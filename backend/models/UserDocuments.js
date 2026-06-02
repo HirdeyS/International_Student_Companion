@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const documentSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -31,7 +30,4 @@ const userDocumentsSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model(
-  "UserDocuments",
-  userDocumentsSchema
-);
+export default mongoose.model("UserDocuments", userDocumentsSchema);

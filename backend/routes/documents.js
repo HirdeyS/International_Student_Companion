@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const UserDocuments = require("../models/UserDocuments");
+import UserDocuments from "../models/UserDocuments.js";
 
 const requiredDocuments = [
   "Study Permit",
@@ -221,4 +221,4 @@ router.delete("/:userId/:documentId", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
