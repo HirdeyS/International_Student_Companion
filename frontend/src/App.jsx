@@ -14,6 +14,7 @@ import DocumentsPage from "./pages/DocumentsPage";
 import CommunityPage from "./pages/CommunityPage";
 import AdminCommunityPage from "./pages/AdminCommunityPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AboutPage from "./pages/AboutPage";
 import "leaflet/dist/leaflet.css";
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/reminders" element={<DocumentsPage />} />
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/admin/community" element={<AdminCommunityPage />} />
       </Routes>
     </Layout>
