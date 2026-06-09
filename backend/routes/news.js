@@ -3,10 +3,8 @@ import News from '../models/News.js';
 
 const router = express.Router();
 
-// @desc    Get all news articles
-// @route   GET /api/news
-// @access  Public
-router.get('/', async (req, res) => {
+// GET /api/news - Get all news articles
+router.get("/", async (req, res) => {
   try {
     const news = await News.find().sort({ pubDate: -1 }).limit(50);
     res.json(news);

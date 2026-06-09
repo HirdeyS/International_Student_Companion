@@ -3,14 +3,11 @@ import CommunityPost from "../models/CommunityPost.js";
 import Message from "../models/Message.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { admin } from "../middleware/adminMiddleware.js";
+import { sendEmail } from "../services/emailService.js";
 
 const router = express.Router();
 
-/**
- * @route   GET /api/community
- * @desc    Get all approved community posts with pagination and optional group filter
- * @access  Private
- */
+// GET /api/community - Get approved community posts
 router.get("/", protect, async (req, res) => {
     try {
         const { group, page = 1, limit = 20 } = req.query;
@@ -40,11 +37,7 @@ router.get("/", protect, async (req, res) => {
     }
 });
 
-/**
- * @route   POST /api/community
- * @desc    Create a new community post (pending approval)
- * @access  Private
- */
+// POST /api/community - Create a new community post
 router.post("/", protect, async (req, res) => {
     try {
         const { content, group, image } = req.body;
@@ -69,11 +62,7 @@ router.post("/", protect, async (req, res) => {
     }
 });
 
-/**
- * @route   PUT /api/community/:id/like
- * @desc    Toggle like on an approved post
- * @access  Private
- */
+// PUT /api/community/:id/like - Toggle like on an approved post
 router.put("/:id/like", protect, async (req, res) => {
     try {
         const post = await CommunityPost.findOne({ _id: req.params.id, status: "approved" });
@@ -103,11 +92,7 @@ router.put("/:id/like", protect, async (req, res) => {
     }
 });
 
-/**
- * @route   POST /api/community/:id/comment
- * @desc    Add a comment to an approved post
- * @access  Private
- */
+// POST /api/community/:id/comment - Add a comment to an approved post
 router.post("/:id/comment", protect, async (req, res) => {
     try {
         const { text } = req.body;
@@ -135,11 +120,7 @@ router.post("/:id/comment", protect, async (req, res) => {
     }
 });
 
-/**
- * @route   DELETE /api/community/:id/comment/:commentId
- * @desc    Delete a comment
- * @access  Private
- */
+// DELETE /api/community/:id/comment/:commentId - Delete a comment
 router.delete("/:id/comment/:commentId", protect, async (req, res) => {
     try {
         const post = await CommunityPost.findById(req.params.id);
@@ -166,11 +147,7 @@ router.delete("/:id/comment/:commentId", protect, async (req, res) => {
     }
 });
 
-/**
- * @route   POST /api/community/:id/report
- * @desc    Report an approved post
- * @access  Private
- */
+// POST /api/community/:id/report - Report an approved post
 router.post("/:id/report", protect, async (req, res) => {
     try {
         const post = await CommunityPost.findOne({ _id: req.params.id, status: "approved" });
@@ -189,11 +166,7 @@ router.post("/:id/report", protect, async (req, res) => {
     }
 });
 
-/**
- * @route   GET /api/community/pending
- * @desc    Get all pending community posts for moderation
- * @access  Private/Admin
- */
+// GET /api/community/pending - Get pending posts for moderation (Admin only)
 router.get("/pending", protect, admin, async (req, res) => {
     try {
         const posts = await CommunityPost.find({ status: "pending" })
@@ -205,11 +178,7 @@ router.get("/pending", protect, admin, async (req, res) => {
     }
 });
 
-/**
- * @route   PUT /api/community/:id/approve
- * @desc    Approve a pending community post
- * @access  Private/Admin
- */
+// PUT /api/community/:id/approve - Approve a pending post (Admin only)
 router.put("/:id/approve", protect, admin, async (req, res) => {
     try {
         const post = await CommunityPost.findById(req.params.id);
@@ -226,11 +195,7 @@ router.put("/:id/approve", protect, admin, async (req, res) => {
     }
 });
 
-/**
- * @route   PUT /api/community/:id/reject
- * @desc    Reject a pending community post
- * @access  Private/Admin
- */
+// PUT /api/community/:id/reject - Reject a pending post (Admin only)
 router.put("/:id/reject", protect, admin, async (req, res) => {
     try {
         const { reason } = req.body;
@@ -238,17 +203,32 @@ router.put("/:id/reject", protect, admin, async (req, res) => {
             return res.status(400).json({ message: "Reason is required for rejection" });
         }
 
-        const post = await CommunityPost.findById(req.params.id);
+        const post = await CommunityPost.findById(req.params.id).populate("user", "name email");
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
 
-        // Send notification before deleting
+        // Send internal notification
         await Message.create({
             sender: req.user._id, 
-            reciever: post.user,
+            reciever: post.user._id,
             content: `Your post "${post.content.substring(0, 20)}..." was rejected. Reason: ${reason}`
         });
+
+        // Send email notification
+        if (post.user && post.user.email) {
+            setImmediate(async () => {
+                try {
+                    await sendEmail(
+                        post.user.email,
+                        "Community Post Rejected",
+                        `Hello ${post.user.name},\n\nYour recent post in the community was rejected for the following reason:\n\n"${reason}"\n\nPost content snippet: "${post.content.substring(0, 50)}..."\n\nIf you have any questions, please contact the support team.`
+                    );
+                } catch (emailErr) {
+                    console.error("Failed to send rejection email:", emailErr);
+                }
+            });
+        }
 
         await CommunityPost.findByIdAndDelete(req.params.id);
 
@@ -258,11 +238,7 @@ router.put("/:id/reject", protect, admin, async (req, res) => {
     }
 });
 
-/**
- * @route   PUT /api/community/:id/delete
- * @desc    Delete an approved community post (Admin override)
- * @access  Private/Admin
- */
+// PUT /api/community/:id/delete - Delete an approved post (Admin only)
 router.put("/:id/delete", protect, admin, async (req, res) => {
     try {
         const { reason } = req.body;
@@ -270,17 +246,32 @@ router.put("/:id/delete", protect, admin, async (req, res) => {
             return res.status(400).json({ message: "Reason is required for deletion" });
         }
 
-        const post = await CommunityPost.findById(req.params.id);
+        const post = await CommunityPost.findById(req.params.id).populate("user", "name email");
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
 
-        // Send notification before deleting
+        // Send internal notification
         await Message.create({
             sender: req.user._id,
-            reciever: post.user,
+            reciever: post.user._id,
             content: `Your post "${post.content.substring(0, 20)}..." was removed by a moderator. Reason: ${reason}`
         });
+
+        // Send email notification
+        if (post.user && post.user.email) {
+            setImmediate(async () => {
+                try {
+                    await sendEmail(
+                        post.user.email,
+                        "Community Post Removed",
+                        `Hello ${post.user.name},\n\nYour post in the community was removed by a moderator for the following reason:\n\n"${reason}"\n\nPost content snippet: "${post.content.substring(0, 50)}..."\n\nIf you have any questions, please contact the support team.`
+                    );
+                } catch (emailErr) {
+                    console.error("Failed to send removal email:", emailErr);
+                }
+            });
+        }
 
         await CommunityPost.findByIdAndDelete(req.params.id);
 

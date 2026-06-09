@@ -149,6 +149,10 @@ export default function Navbar() {
               </Button>
             ))}
 
+            <Button component={Link} to="/about" sx={{ color: "white" }}>
+              About
+            </Button>
+
             {isAuthenticated &&
               baseLinks.map((item) => (
                 <Button
