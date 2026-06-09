@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { sendEmail } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -68,29 +69,13 @@ router.post("/register", async (req, res) => {
 
     setImmediate(async () => {
       try {
-
-        console.log("EMAIL_USER:", process.env.EMAIL_USER);
-        console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
-        
-        const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 465,
-          secure: true,
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: user.email,
-          subject: "Verify your account",
-          text: `Click this link to verify your account: http://localhost:3000/api/verify/${token}`,
-        });
-
+        await sendEmail(
+          user.email,
+          "Verify your account",
+          `Click this link to verify your account: http://localhost:3000/api/verify/${token}`
+        );
         console.log("Verification email sent to:", user.email);
-      } catch(e) {
+      } catch (e) {
         console.error("Email send error", e);
       }
     });
