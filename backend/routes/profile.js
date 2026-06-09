@@ -11,12 +11,25 @@ router.get("/me", protect, async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (user.role === "landlord") {
-      const myListings = await Listing.find({ landlord: user._id });
-      res.myListings = myListings;
-    }
+    const response = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
 
-    res.json(user);
+      // student fields
+      program: user.program || "",
+      countryOfOrigin: user.countryOfOrigin || "",
+      bio: user.bio || "",
+
+      // landlord fields
+      businessName: user.businessName || "",
+      phoneNumber: user.phoneNumber || "",
+      website: user.website || "",
+      about: user.about || "",
+    };
+
+    return res.json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -25,10 +38,23 @@ router.get("/me", protect, async (req, res) => {
 // PUT update current logged-in user's profile
 router.put("/me", protect, async (req, res) => {
   try {
-    const updated = await User.findByIdAndUpdate(req.user.id, req.body, { new: true });
+    const updated = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).lean();
     if (!updated) return res.status(404).json({ message: "User not found" });
-    res.json(updated);
-  } catch (err) {
+    return res.json({
+      _id: updated._id,
+      name: updated.name,
+      email: updated.email,
+      role: updated.role,
+
+      program: updated.program || "",
+      countryOfOrigin: updated.countryOfOrigin || "",
+      bio: updated.bio || "",
+
+      businessName: updated.businessName || "",
+      phoneNumber: updated.phoneNumber || "",
+      website: updated.website || "",
+      about: updated.about || "",
+    });  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

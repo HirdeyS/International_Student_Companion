@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getMe } from "../services/authService";
+import { getMe, updateProfile } from "../services/authService";
 import Loader from "../components/ui/Loader";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import { Typography, Divider, Chip } from "@mui/material";
@@ -41,7 +41,8 @@ export default function ProfilePage() {
       const updated = await updateProfile(form);
       setUser(updated);
       alert("Profile updated!");
-    } catch {
+    } catch(err) {
+      console.error(err);
       setError("Failed to update profile");
     }
   }
@@ -55,7 +56,7 @@ export default function ProfilePage() {
         Profile
       </Typography>
 
-      <Chip label={form.role.toUpperCase()} color="primary" sx={{ mb: 2 }} />
+      <Chip label={(form.role || "").toUpperCase()} color="primary" sx={{ mb: 2 }} />
 
       <Divider sx={{ my: 2 }} />
 

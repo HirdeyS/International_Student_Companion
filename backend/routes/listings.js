@@ -84,6 +84,17 @@ router.get("/filter", async (req, res) => {
   }
 });
 
+router.get("/landlord/:id", async (req, res) => {
+  try {
+    const listings = await Listing.find({ landlord: req.params.id })
+      .populate("landlord", "name email role");
+
+    res.json(listings);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to load landlord listings", error: err });
+  }
+});
+
 /* ============================
    GET single listing by ID
 =============================== */
@@ -103,16 +114,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.get("/landlord/:id", async (req, res) => {
-  try {
-    const listings = await Listing.find({ landlord: req.params.id })
-      .populate("landlord", "name email role");
 
-    res.json(listings);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to load landlord listings", error: err });
-  }
-});
 
 /* ============================
    CREATE a new listing

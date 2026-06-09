@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getListings, deleteListing } from "../services/listingService";
+import { getListingsByLandlord, deleteListing } from "../services/listingService";
 import { useAuth } from "../context/AuthContext";
 import Card from "../components/ui/Card";
 import PrimaryButton from "../components/ui/PrimaryButton";
@@ -17,17 +17,20 @@ export default function LandlordDashboard() {
     useEffect(() => {
         async function loadListings() {
             try {
-                const allListings = await getListings();
+                setLoading(true);
+                setError("");
 
-                console.log("USER:", user);
-console.log("ALL LISTINGS:", allListings);
+                if (!user?._id) {
+                    setListings([]);
+                    setLoading(false);
+                    return;
+                }
 
-                const mine = allListings.filter(
-                    (listing) => listing.landlord?._id === user.id
-                );
-
-                setListings(mine);
+                const data = await getListingsByLandlord(user._id);
+                console.log(data);
+                setListings(data);
             } catch (err) {
+                console.error(err);
                 setError("Failed to load your listings");
             } finally {
                 setLoading(false);
@@ -35,7 +38,7 @@ console.log("ALL LISTINGS:", allListings);
         }
 
         loadListings();
-    }, [user]);
+    }, [user?._id]);
 
     async function handleDelete(id) {
         if (!window.confirm("Delete this listing?")) return;

@@ -9,10 +9,21 @@ import {
   useTheme,
 } from "@mui/material";
 import PrimaryButton from "../components/ui/PrimaryButton";
+import { getMe } from "../services/authService";
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuth();
+  const { user, setUser, isAuthenticated } = useAuth();
   const theme = useTheme();
+
+  async function load(){
+    try {
+        const data = await getMe();
+  setUser(data);
+
+    } catch {
+      console.log("error loading user");
+    }
+  }
 
   if (!isAuthenticated) {
     return (
@@ -159,7 +170,7 @@ export default function HomePage() {
   return (
     <Box sx={{ mt: 6, textAlign: "center" }}>
       <Typography variant="h3" fontWeight={700} gutterBottom>
-        Welcome Back!
+        Welcome Back + {user.name}
       </Typography>
     </Box>
   );
