@@ -14,7 +14,7 @@ import newsRoutes from "./routes/news.js";
 import communityRoutes from "./routes/community.js";
 import documentRoutes from "./routes/documents.js";
 import { runSeed } from "./seed/index.js";
-import { syncIRCCNews } from "./services/newsService.js";
+import { syncAllNews } from "./services/newsService.js";
 
 dotenv.config();
 console.log("MONGO_URI =", process.env.MONGO_URI);
@@ -54,13 +54,13 @@ mongoose
       await runSeed();
     }
 
-    // Schedule IRCC news sync every 6 hours
+    // Schedule news sync every 6 hours
     cron.schedule("0 */6 * * *", () => {
-      syncIRCCNews();
+      syncAllNews();
     });
 
-    // Run initial sync in background (don't await to avoid blocking)
-    syncIRCCNews();
+    // Run initial sync in background
+    syncAllNews();
   })
   .catch((err) => console.error("MongoDB connection error:", err));
 

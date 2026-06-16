@@ -16,10 +16,6 @@ const newsSchema = new mongoose.Schema({
   },
   summary: {
     type: String
-  },
-  category: {
-    type: String,
-    default: 'IRCC Update' 
   }
 }, { timestamps: true });
 
