@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  Box,
+  Container,
+  Typography,
+  Stack,
+} from "@mui/material";
+
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 
 import Card from "../components/ui/Card";
 import TextInput from "../components/ui/TextInput";
@@ -13,26 +21,26 @@ import {
   reportPost,
 } from "../services/communityService";
 
+
 export default function CommunityPage() {
-  const [posts, setPosts] =
-    useState([]);
+  const [posts, setPosts] = useState([]);
 
-  const [content, setContent] =
-    useState("");
+  const [content, setContent] = useState("");
 
-  const [group, setGroup] =
-    useState("General");
+  const [group, setGroup] = useState("General");
+
 
   useEffect(() => {
     loadPosts();
   }, []);
 
+
   async function loadPosts() {
-    const data =
-      await getPosts();
+    const data = await getPosts();
 
     setPosts(data);
   }
+
 
   async function handleCreate() {
     await createPost({
@@ -42,16 +50,16 @@ export default function CommunityPage() {
 
     setContent("");
 
-    alert(
-      "Post submitted for approval"
-    );
+    alert("Post submitted for approval");
   }
+
 
   async function handleLike(id) {
     await likePost(id);
 
     loadPosts();
   }
+
 
   async function handleReport(id) {
     await reportPost(id);
@@ -61,57 +69,133 @@ export default function CommunityPage() {
     loadPosts();
   }
 
+
   return (
-    <div
-      style={{
-        maxWidth: 1000,
-        margin: "20px auto",
+    <Container
+      maxWidth="md"
+      sx={{
+        py: 5,
       }}
     >
-      <h2>Community Forum</h2>
 
-      <Card sx={{ marginBottom: 3 }}>
-        <h3>Create Post</h3>
-
-        <TextInput
-          label="Group"
-          value={group}
-          onChange={(e) =>
-            setGroup(
-              e.target.value
-            )
-          }
+      {/* HEADER */}
+      <Stack
+        direction="row"
+        spacing={1}
+        alignItems="center"
+        mb={4}
+      >
+        <ForumOutlinedIcon
+          sx={{
+            fontSize: 35,
+            color: "primary.main",
+          }}
         />
 
-        <TextInput
-          label="Post Content"
-          value={content}
-          onChange={(e) =>
-            setContent(
-              e.target.value
-            )
-          }
-        />
-
-        <PrimaryButton
-          onClick={handleCreate}
+        <Typography
+          variant="h3"
+          fontWeight={800}
         >
-          Submit Post
-        </PrimaryButton>
+          Community Forum
+        </Typography>
+      </Stack>
+
+
+      {/* CREATE POST */}
+      <Card
+        sx={{
+          mb: 4,
+          p: 3,
+        }}
+      >
+
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          mb={3}
+        >
+          Create Post
+        </Typography>
+
+
+        <Stack spacing={2}>
+
+          <TextInput
+            label="Group"
+            value={group}
+            onChange={(e) =>
+              setGroup(e.target.value)
+            }
+          />
+
+
+          <TextInput
+            label="Post Content"
+            multiline
+            rows={4}
+            value={content}
+            onChange={(e) =>
+              setContent(e.target.value)
+            }
+          />
+
+
+          <PrimaryButton
+            onClick={handleCreate}
+          >
+            Submit Post
+          </PrimaryButton>
+
+        </Stack>
+
       </Card>
 
-      {posts.map((post) => (
-        <ForumPost
-          key={post._id}
-          post={post}
-          onLike={handleLike}
-          onReport={handleReport}
-        />
-      ))}
 
-      <p style={{ color: "#666" }}>
-  Posts are reviewed before appearing publicly.
-</p>
-    </div>
+
+      {/* POSTS */}
+      <Stack spacing={3}>
+
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <ForumPost
+              key={post._id}
+              post={post}
+              onLike={handleLike}
+              onReport={handleReport}
+            />
+          ))
+        ) : (
+          <Card
+            sx={{
+              textAlign:"center",
+              py:5,
+            }}
+          >
+            <Typography
+              color="text.secondary"
+            >
+              No posts available yet. Be the first to start a discussion!
+            </Typography>
+          </Card>
+        )}
+
+      </Stack>
+
+
+
+      {/* FOOTER NOTE */}
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          mt:4,
+          textAlign:"center",
+        }}
+      >
+        Posts are reviewed before appearing publicly.
+      </Typography>
+
+
+    </Container>
   );
 }
