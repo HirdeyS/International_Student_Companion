@@ -1,15 +1,9 @@
 import User from "../models/User.js";
 
 export async function seedUsers() {
-    const existing = await User.countDocuments();
-    if (existing > 0) {
-        console.log("Users already exist - skipping user seed.")
-        return await User.find({});
-    }
+    console.log("Checking users...");
 
-    console.log("Seeding sample users...");
-
-    const users = [
+    const seedUsers = [
         {
             name: "Alice Student",
             email: "alice@student.com",
@@ -47,8 +41,22 @@ export async function seedUsers() {
         },
     ];
 
-    const created = await User.insertMany(users);
-    console.log("Users seeded.");
 
-    return created;
+    for (const user of seedUsers) {
+        const exists = await User.findOne({
+            email: user.email
+        });
+
+        if (!exists) {
+            await User.create(user);
+            console.log(`Created ${user.role}: ${user.name}`);
+        }
+    }
+
+
+    const users = await User.find({});
+
+    console.log("User check complete.");
+
+    return users;
 }

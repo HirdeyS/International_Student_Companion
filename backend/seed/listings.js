@@ -29,10 +29,15 @@ export async function seedListings(landlords) {
     }
 
     console.log("Seeding sample listings...");
+    if (!landlords || landlords.length === 0) {
+        console.log("No landlords available. Cannot seed listings.");
+        return;
+    }
 
     const landlord1 = landlords[0];
     const landlord2 = landlords[1] || landlords[0];
 
+    
     const fixedListings = [
         {
         title: "Modern Studio Near Sheridan",
