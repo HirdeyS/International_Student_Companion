@@ -99,7 +99,7 @@ export default function AboutPage() {
               color: "transparent",
             }}
           >
-            About International Student Companion 🌎
+            About International Student Companion
           </Typography>
 
           <Typography

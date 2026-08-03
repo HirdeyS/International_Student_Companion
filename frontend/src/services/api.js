@@ -1,24 +1,48 @@
 import axios from "axios";
 
 /*
-* Central Axios instance used across the app.
-* Automatically attaches JWT token to every request
-*/
+ * Central Axios instance used across the app.
+ * Connects React frontend to Express backend.
+ */
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  baseURL: "http://localhost:3000/api",
 });
 
+
 /*
-*Adds auth token to header if found in local storage
-*/
-api.interceptors.request.use((config) => {
+ * Attach JWT token if available
+ */
+api.interceptors.request.use(
+  (config) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
-});
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+
+/*
+ * Global API error logging
+ */
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error(
+      "API Error:",
+      error.response?.data || error.message
+    );
+
+    return Promise.reject(error);
+  }
+);
+
 
 export default api;

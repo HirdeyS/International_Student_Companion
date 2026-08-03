@@ -23,6 +23,7 @@ console.log("MONGO_URI =", process.env.MONGO_URI);
 
 const app = express();
 
+
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true
@@ -30,6 +31,11 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
+
+app.use(
+  "/uploads",
+  express.static("uploads")
+);
 
 // Routes
 app.use("/api/profile", profileRoutes);
