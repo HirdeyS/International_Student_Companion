@@ -1,7 +1,9 @@
 import { seedUsers } from "./users.js";
 import { seedListings } from "./listings.js";
+import { seedCommunityPosts } from "./community.js";
+
 export async function runSeed() {
-    
+
     console.log("Checking if seeding is required...");
 
     const users = await seedUsers();
@@ -16,6 +18,8 @@ export async function runSeed() {
     }
 
     await seedListings(landlords);
+      
+    await seedCommunityPosts(users);
 
     console.log("Seeding complete.");
 }
